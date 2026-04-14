@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Examen Overzicht 2026</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    /* ════════════════════════════════
+       TOKENS & RESET
+    ════════════════════════════════ */
+    :root {
+      --blue:    #1a237e;
+      --blue2:   #3949ab;
+      --blue3:   #7986cb;
+      --red:     #e53935;
+      --green:   #2e7d32;
+      --green2:  #43a047;
+      --orange:  #e65100;
+      --purple:  #6a1b9a;
+      --bg:      #f0f2f8;
+      --surface: #ffffff;
+      --text:    #1c1c2e;
+      --muted:   #64748b;
+      --border:  #e2e8f0;
+      --r:       14px;
+      --shadow:  0 2px 16px rgba(26,35,126,0.09);
+      --shadow2: 0 8px 32px rgba(26,35,126,0.16);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ════════════════════════════════
+       HEADER
+    ════════════════════════════════ */
+    .site-header {
+      background: linear-gradient(135deg, #0d1b6e 0%, #1a237e 45%, #283593 100%);
+      color: #fff;
+      padding: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .header-bg-circles {
+      position: absolute; inset: 0; pointer-events: none;
+    }
+    .header-bg-circles span {
+      position: absolute; border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+    }
+    .header-bg-circles span:nth-child(1) { width:320px;height:320px;top:-100px;right:-80px; }
+    .header-bg-circles span:nth-child(2) { width:200px;height:200px;bottom:-60px;left:-40px; }
+    .header-bg-circles span:nth-child(3) { width:120px;height:120px;top:20px;left:40%; }
+    .header-inner {
+      max-width: 1100px; margin: 0 auto;
+      padding: 52px 24px 40px;
+      position: relative; z-index: 1;
+      text-align: center;
+    }
+    .header-pill {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 50px;
+      padding: 5px 20px;
+      font-size: 0.8rem; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .header-inner h1 {
+      font-size: clamp(2rem, 6vw, 3.4rem);
+      font-weight: 900; letter-spacing: -1px;
+      line-height: 1.1; margin-bottom: 12px;
+    }
+    .header-inner p {
+      font-size: 1rem; opacity: 0.75; max-width: 480px; margin: 0 auto 28px;
+    }
+    .countdown-strip {
+      background: rgba(0,0,0,0.25);
+      border-radius: 12px;
+      padding: 14px 24px;
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 0.9rem; font-weight: 600;
+    }
+    .countdown-strip .cd-blocks {
+      display: flex; gap: 8px;
+    }
+    .cd-block {
+      background: rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 6px 12px;
+      text-align: center;
+      min-width: 52px;
+    }
+    .cd-block .num { font-size: 1.4rem; font-weight: 900; line-height: 1; display: block; }
+    .cd-block .lbl { font-size: 0.62rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ════════════════════════════════
+       NAV
+    ════════════════════════════════ */
+    .site-nav {
+      background: var(--blue);
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; overflow-x: auto;
+      scrollbar-width: none;
+      padding: 0 12px;
+    }
+    .nav-inner::-webkit-scrollbar { display: none; }
+    .nav-btn {
+      flex-shrink: 0;
+      background: none; border: none;
+      color: rgba(255,255,255,0.65);
+      padding: 14px 20px;
+      font-size: 0.88rem; font-weight: 600;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+    .nav-btn:hover { color: #fff; background: rgba(255,255,255,0.07); }
+    .nav-btn.active { color: #fff; border-bottom-color: #7986cb; }
+
+    /* ════════════════════════════════
+       LAYOUT
+    ════════════════════════════════ */
+    .page-wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px 80px; }
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* ════════════════════════════════
+       SECTION HEADINGS
+    ════════════════════════════════ */
+    .sec-heading {
+      display: flex; align-items: center; gap: 14px;
+      margin: 40px 0 20px;
+    }
+    .sec-heading-icon {
+      width: 46px; height: 46px; border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; flex-shrink: 0;
+    }
+    .sec-heading h2 { font-size: 1.25rem; font-weight: 800; color: var(--blue); }
+    .sec-heading p  { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
+
+    /* ════════════════════════════════
+       TIJDVAK BLOCKS
+    ════════════════════════════════ */
+    .tijdvak {
+      border-radius: var(--r);
+      padding: 26px 26px 22px;
+      margin-top: 32px;
+      border: 2px solid transparent;
+    }
+    .tijdvak.tv1 { background: linear-gradient(135deg,#e8eaf6,#f3f4fb); border-color: #c5cae9; }
+    .tijdvak.tv3 { background: linear-gradient(135deg,#e8f5e9,#f1f8f1); border-color: #c8e6c9; }
+
+    .tv-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+    .tv-num {
+      width: 50px; height: 50px; border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; font-weight: 900; color: #fff; flex-shrink: 0;
+    }
+    .tv1 .tv-num { background: var(--blue); }
+    .tv3 .tv-num { background: var(--green); }
+    .tv-title h2 { font-size: 1.2rem; font-weight: 800; }
+    .tv1 .tv-title h2 { color: var(--blue); }
+    .tv3 .tv-title h2 { color: var(--green); }
+    .tv-title p { font-size: 0.85rem; color: var(--muted); margin-top: 3px; }
+
+    .sub-row {
+      display: flex; align-items: center; gap: 10px;
+      margin: 20px 0 14px; flex-wrap: wrap;
+    }
+    .pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      border-radius: 50px; padding: 5px 14px;
+      font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    .pill-blue   { background: #e3f2fd; color: #1565c0; }
+    .pill-purple { background: #f3e5f5; color: var(--purple); }
+    .pill-orange { background: #fff3e0; color: var(--orange); }
+    .sub-loc { font-size: 0.82rem; color: var(--muted); }
+
+    /* ════════════════════════════════
+       EXAM CARDS
+    ════════════════════════════════ */
+    .exam-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 14px;
+    }
+    .exam-card {
+      background: var(--surface);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      padding: 18px 20px 16px;
+      border-left: 5px solid #ccc;
+      position: relative;
+      transition: transform 0.18s, box-shadow 0.18s;
+      overflow: hidden;
+    }
+    .exam-card:hover { transform: translateY(-3px); box-shadow: var(--shadow2); }
+
+    .c-nat { border-left-color: #1e88e5; }
+    .c-ned { border-left-color: #e53935; }
+    .c-fil { border-left-color: #8e24aa; }
+    .c-wis { border-left-color: #fb8c00; }
+    .c-sch { border-left-color: #00897b; }
+    .c-bio { border-left-color: #43a047; }
+    .c-mon { border-left-color: #8e24aa; }
+
+    .card-dag {
+      position: absolute; top: 14px; right: 14px;
+      background: var(--bg); border-radius: 7px;
+      padding: 3px 9px; font-size: 0.7rem; font-weight: 700;
+      color: var(--blue); text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .card-vak {
+      font-size: 1.05rem; font-weight: 800;
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 12px; padding-right: 60px;
+    }
+    .card-rows { display: flex; flex-direction: column; gap: 6px; }
+    .card-row {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.86rem; color: var(--muted);
+    }
+    .card-lbl {
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--blue);
+      background: #eef0fb; border-radius: 5px;
+      padding: 2px 7px; min-width: 54px; text-align: center; flex-shrink: 0;
+    }
+    .card-row strong { color: var(--text); font-weight: 600; }
+
+    .card-cd {
+      margin-top: 12px; padding-top: 10px;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: baseline; gap: 6px;
+    }
+    .cd-days { font-size: 1.6rem; font-weight: 900; color: var(--blue); line-height: 1; }
+    .cd-days.done { font-size: 1rem; color: var(--green2); }
+    .cd-days.today-lbl { font-size: 1rem; color: var(--red); }
+    .cd-suffix { font-size: 0.78rem; color: var(--muted); }
+
+    /* herkansing tag */
+    .herk-tag {
+      font-size: 0.68rem; background: #fff3e0; color: var(--orange);
+      border-radius: 5px; padding: 2px 7px; font-weight: 700; margin-left: 4px;
+    }
+
+    /* ════════════════════════════════
+       FULL TABLE
+    ════════════════════════════════ */
+    .table-wrap {
+      background: var(--surface); border-radius: var(--r);
+      box-shadow: var(--shadow); overflow-x: auto;
+    }
+    table { width: 100%; border-collapse: collapse; min-width: 600px; }
+    thead tr { background: var(--blue); color: #fff; }
+    thead th { padding: 13px 15px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; text-align: left; white-space: nowrap; }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #f4f6ff; }
+    tbody td { padding: 11px 15px; font-size: 0.88rem; vertical-align: middle; }
+    .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; vertical-align: middle; }
+    .tbadge { display: inline-block; font-size: 0.7rem; font-weight: 700; border-radius: 5px; padding: 2px 8px; }
+
+    /* ════════════════════════════════
+       CALENDAR
+    ════════════════════════════════ */
+    .cal-grid-months {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .cal-month {
+      background: var(--surface); border-radius: var(--r);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .cal-month-hdr {
+      background: var(--blue); color: #fff;
+      padding: 14px 18px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .cal-month-hdr .mname { font-size: 1rem; font-weight: 800; }
+    .cal-month-hdr .mnum  {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px;
+      background: rgba(255,255,255,0.18); border-radius: 6px; padding: 3px 10px;
+      text-transform: uppercase;
+    }
+    .cal-table { width: 100%; border-collapse: collapse; }
+    .cal-table thead th {
+      background: #eef0fb; color: var(--blue);
+      padding: 8px 4px; font-size: 0.72rem; font-weight: 700;
+      text-align: center; text-transform: uppercase; letter-spacing: 0.3px;
+      border-bottom: 2px solid var(--border);
+    }
+    .cal-table thead th.wk-col {
+      background: #e8eaf6; color: var(--muted); font-size: 0.65rem;
+      border-right: 2px solid var(--border);
+    }
+    .cal-table tbody td {
+      padding: 0; border: 1px solid var(--border);
+      vertical-align: top; width: calc(100% / 7);
+    }
+    .cal-table tbody td.wk-cell {
+      background: #f4f6ff; color: var(--blue);
+      font-size: 0.65rem; font-weight: 800;
+      text-align: center; vertical-align: middle;
+      width: 28px; min-width: 28px;
+      border-right: 2px solid var(--border);
+      padding: 4px 2px;
+    }
+    .cal-day-inner {
+      min-height: 64px; padding: 5px 5px 4px;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .cal-day-num {
+      font-size: 0.78rem; font-weight: 700; color: var(--text);
+      width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; flex-shrink: 0; margin-bottom: 2px;
+    }
+    .cal-day-num.is-today { background: var(--red); color: #fff; }
+    .cal-day-num.is-weekend { color: #9e9e9e; }
+    td.has-exam .cal-day-inner { background: #f0f2ff; }
+    td.is-today-cell .cal-day-inner { background: #fffde7; }
+    td.is-empty { background: #fafbff; }
+    td.is-weekend-col { background: #fafbff; }
+    .ev-chip {
+      font-size: 0.62rem; font-weight: 700;
+      border-radius: 4px; padding: 2px 5px;
+      line-height: 1.3; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+      display: block;
+    }
+    .ev-nat  { background: #bbdefb; color: #0d47a1; }
+    .ev-ned  { background: #ffcdd2; color: #b71c1c; }
+    .ev-fil  { background: #e1bee7; color: #4a148c; }
+    .ev-wis  { background: #ffe0b2; color: #bf360c; }
+    .ev-sch  { background: #b2dfdb; color: #004d40; }
+    .ev-bio  { background: #c8e6c9; color: #1b5e20; }
+    .ev-mon  { background: #e1bee7; color: #4a148c; }
+    .ev-herk { background: #ffe0b2; color: #bf360c; }
+
+    .cal-legend {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 20px;
+    }
+    .cal-legend-item {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 0.78rem; font-weight: 600; color: var(--text);
+    }
+    .cal-legend-dot {
+      width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0;
+    }
+
+    /* ════════════════════════════════
+       MAP
+    ════════════════════════════════ */
+    #map {
+      height: 460px; border-radius: var(--r);
+      box-shadow: var(--shadow); margin-bottom: 24px;
+    }
+    .dist-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px; margin-bottom: 28px;
+    }
+    .dist-card {
+      background: var(--surface); border-radius: var(--r);
+      box-shadow: var(--shadow); padding: 18px 20px;
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .dist-icon {
+      width: 44px; height: 44px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; flex-shrink: 0;
+    }
+    .dist-card h3 { font-size: 0.95rem; font-weight: 700; color: var(--blue); margin-bottom: 4px; }
+    .dist-card p  { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+    .dist-row { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .dist-badge {
+      background: #eef0fb; color: var(--blue);
+      border-radius: 7px; padding: 4px 10px;
+      font-size: 0.8rem; font-weight: 700;
+    }
+    .dist-badge small { font-size: 0.65rem; font-weight: 600; opacity: 0.7; display: block; }
+
+    /* ════════════════════════════════
+       STUDY TRACKER
+    ════════════════════════════════ */
+    .tracker-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+    .tracker-card {
+      background: var(--surface); border-radius: var(--r);
+      box-shadow: var(--shadow); padding: 20px 22px;
+      border-left: 5px solid #ccc;
+    }
+    .tracker-card .tk-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .tracker-card .tk-vak { font-size: 1rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .tracker-card .tk-pct { font-size: 1.2rem; font-weight: 900; color: var(--blue); }
+    .progress-bar-bg {
+      background: var(--border); border-radius: 50px; height: 10px;
+      overflow: hidden; margin-bottom: 12px;
+    }
+    .progress-bar-fill {
+      height: 100%; border-radius: 50px;
+      transition: width 0.5s ease;
+    }
+    .tk-topics { display: flex; flex-direction: column; gap: 7px; }
+    .tk-topic {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.84rem; cursor: pointer;
+      padding: 4px 0;
+    }
+    .tk-topic input[type=checkbox] {
+      width: 16px; height: 16px; cursor: pointer;
+      accent-color: var(--blue);
+      flex-shrink: 0;
+    }
+    .tk-topic label { cursor: pointer; user-select: none; }
+    .tk-topic.checked label { text-decoration: line-through; color: var(--muted); }
+    .tracker-note {
+      background: #eef0fb; border-radius: 8px;
+      padding: 10px 14px; margin-top: 12px;
+      font-size: 0.8rem; color: var(--muted);
+    }
+
+    /* ════════════════════════════════
+       TIMELINE
+    ════════════════════════════════ */
+    .tl { position: relative; padding-left: 34px; }
+    .tl::before {
+      content: ''; position: absolute; left: 12px; top: 0; bottom: 0;
+      width: 3px; background: linear-gradient(to bottom, var(--blue2), var(--green2));
+      border-radius: 2px;
+    }
+    .tl-item { position: relative; margin-bottom: 18px; }
+    .tl-dot {
+      position: absolute; left: -27px; top: 14px;
+      width: 15px; height: 15px; border-radius: 50%;
+      border: 3px solid #fff; box-shadow: 0 0 0 2px currentColor;
+    }
+    .tl-card { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow); padding: 16px 20px; }
+    .tl-card h3 { font-size: 0.97rem; font-weight: 700; color: var(--blue); margin-bottom: 5px; }
+    .tl-card p  { font-size: 0.87rem; color: var(--muted); line-height: 1.6; }
+    .tl-date {
+      display: inline-block; font-size: 0.75rem; font-weight: 700;
+      background: #eef0fb; color: var(--blue); border-radius: 5px;
+      padding: 2px 9px; margin-bottom: 7px;
+    }
+
+    /* ════════════════════════════════
+       FOOTER
+    ════════════════════════════════ */
+    footer {
+      text-align: center; padding: 32px 20px;
+      color: var(--muted); font-size: 0.82rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ════════════════════════════════
+       RESPONSIVE
+    ════════════════════════════════ */
+    @media (max-width: 700px) {
+      .header-inner { padding: 36px 16px 28px; }
+      .countdown-strip { flex-direction: column; gap: 8px; }
+      .cd-blocks { justify-content: center; }
+      .exam-grid { grid-template-columns: 1fr; }
+      .cal-grid-months { grid-template-columns: 1fr; }
+      .dist-cards { grid-template-columns: 1fr; }
+      .tracker-grid { grid-template-columns: 1fr; }
+      .page-wrap { padding: 0 12px 60px; }
+      .tijdvak { padding: 18px 14px; }
+      #map { height: 320px; }
+      .cal-day-inner { min-height: 48px; }
+      .ev-chip { display: none; }
+      td.has-exam .cal-day-inner::after { content: '●'; font-size: 0.6rem; color: var(--blue); display: block; text-align: center; }
+    }
+    @media (max-width: 420px) {
+      .cd-block { min-width: 42px; padding: 5px 8px; }
+      .cd-block .num { font-size: 1.1rem; }
+      .nav-btn { padding: 12px 14px; font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════ -->
+<header class="site-header">
+  <div class="header-bg-circles">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="header-inner">
+    <div class="header-pill">Staatsexamen 2025 – 2026</div>
+    <h1>📚 Examen Overzicht</h1>
+    <p>Alle examens, datums, locaties en afstanden op één plek</p>
+    <div class="countdown-strip">
+      <span>⏳ Eerste examen (Natuurkunde):</span>
+      <div class="cd-blocks">
+        <div class="cd-block"><span class="num" id="cd-d">–</span><span class="lbl">dagen</span></div>
+        <div class="cd-block"><span class="num" id="cd-h">–</span><span class="lbl">uur</span></div>
+        <div class="cd-block"><span class="num" id="cd-m">–</span><span class="lbl">min</span></div>
+        <div class="cd-block"><span class="num" id="cd-s">–</span><span class="lbl">sec</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════
+     NAV
+═══════════════════════════════════════════ -->
+<nav class="site-nav">
+  <div class="nav-inner">
+    <button class="nav-btn active" onclick="nav(this,'examens')">📝 Examens</button>
+    <button class="nav-btn" onclick="nav(this,'kalender')">📅 Kalender</button>
+    <button class="nav-btn" onclick="nav(this,'kaart')">🗺️ Kaart</button>
+    <button class="nav-btn" onclick="nav(this,'tracker')">✅ Studietracker</button>
+    <button class="nav-btn" onclick="nav(this,'tijdlijn')">🗓️ Tijdlijn</button>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+<!-- ═══════════════════════════════════════════
+     EXAMENS
+═══════════════════════════════════════════ -->
+<div id="sec-examens" class="section active">
+
+  <!-- 1e tijdvak -->
+  <div class="tijdvak tv1">
+    <div class="tv-header">
+      <div class="tv-num">1</div>
+      <div class="tv-title">
+        <h2>1e Tijdvak — Centrale &amp; Mondelinge Staatsexamens</h2>
+        <p>Mei 2026 (schriftelijk) · 13–24 juli 2026 (mondeling)</p>
+      </div>
+    </div>
+
+    <div class="sub-row">
+      <span class="pill pill-blue">✍️ Schriftelijk (Centraal)</span>
+      <span class="sub-loc">Aristo · Vestdijk 30 · 5611 CC Eindhoven</span>
+    </div>
+    <div class="exam-grid">
+      <div class="exam-card c-nat">
+        <div class="card-dag">Maandag</div>
+        <div class="card-vak">⚛️ Natuurkunde</div>
+        <div class="card-rows">
+          <div class="card-row"><span class="card-lbl">Datum</span><strong>11 mei 2026</strong></div>
+          <div class="card-row"><span class="card-lbl">Tijd</span><strong>13:30 – 16:30</strong></div>
+          <div class="card-row"><span class="card-lbl">Duur</span><strong>3 uur</strong></div>
+        </div>
+        <div class="card-cd"><span class="cd-days" id="p-nat">–</span><span class="cd-suffix" id="s-nat">dagen te gaan</span></div>
+      </div>
+      <div class="exam-card c-ned">
+        <div class="card-dag">Dinsdag</div>
+        <div class="card-vak">📖 Nederlands</div>
+        <div class="card-rows">
+          <div class="card-row"><span class="card-lbl">Datum</span><strong>12 mei 2026</strong></div>
+          <div class="card-row"><span class="card-lbl">Tijd</span><strong>13:30 – 16:30</strong></div>
+          <div class="card-row"><span class="card-lbl">Duur</span><strong>3 uur</strong></div>
+        </div>
+        <div class="card-cd"><span class="cd-days" id="p-ned">–</span><span class="cd-suffix" id="s-ned">dagen te gaan</span></div>
+      </div>
+      <div class="exam-card c-fil">
+        <div class="card-dag">Woensdag</div>
+        <div class="card-vak">🧠 Filosofie</div>
+        <div class="card-rows">
+          <div class="card-row"><span class="card-lbl">Datum</span><strong>13 mei 2026</strong></div>
+          <div class="card-row"><span class="card-lbl">Tijd</span><strong>09:00 – 12:00</strong></div>
+          <div class="card-row"><span class="card-lbl">Duur</span><strong>3 uur</strong></div>
+        </div>
+        <div class="card-cd"><span class="cd-days" id="p-fil">–</span><span class="cd-suffix" id="s-fil">dagen te gaan</span></div>
+      </div>
+      <div class="exam-card c-wis">
+        <div class="card-dag">Woensdag</div>
+        <div class="card-vak">📐 Wiskunde B</div>
+        <div class="card-rows">
+          <div class="card-row"><span class="card-lbl">Datum</span><strong>13 mei 2026</strong></div>
+          <div class="card-row"><span class="card-lbl">Tijd</span><strong>13:30 – 16:30</strong></div>
+          <div class="card-row"><span class="card-lbl">Duur</span><strong>3 uur</strong></div>
+        </div>
+        <div class="card-cd"><span class="cd-days" id="p-wis">–</span><span class="cd-suffix" id="s-wis">dagen te gaan</span></div>
+      </div>
+      <div class="exam-card c-sch">
+        <div class="card-dag">Dinsdag</div>
+        <div class="card-vak">🧪 Scheikunde</div>
+        <div class="card-rows">
+          <div class="card-row"><span class="card-lbl">Datum</span><strong>19 mei 2026</strong></div>
+          <div class="card-row"><span class="card-lbl">Tijd</span><strong>13:30 – 16:30</strong></div>
+          <div class="card-row"><span class="card-lbl">Duur</span><strong>3 uur</strong></div>
+        </div>
+        <div class="card-cd"><span class="cd-days" id="p-sch">–</span><span class="cd-suffix" id="s-sch">dagen te gaan</span></div>
+      </div>
+      <div class="exam-card c-bio">
+        <div class="card-dag">Vrijdag</div>
+        <div class="card-vak">🌿 Biologie</div>
+        <div class="card-rows">
+          <div class="card-row"><span class="card-lbl">Datum</span><strong>22 mei 2026</strong></div>
+          <div class="card-row"><span class="card-lbl">Tijd</span><strong>13:30 – 16:30</strong></div>
+          <div class="card-row"><span class="card-lbl">Duur</span><strong>3 uur</strong></div>
+        </div>
+        <div class="card-cd"><span class="cd-days" id="p-bio">–</span><span class="cd-suffix" id="s-bio">dagen te gaan</span></div>
+      </div>
+    </div>
+
+    <div class="sub-row" style="margin-top:26px;">
+      <span class="pill pill-purple">🎤 Mondeling (College Staatsexamen)</span>
+      <span class="sub-loc">2 College Cobbenhagen · Brittendreef 5 · 5012 AE Tilburg</span>
+    </div>
+    <div class="exam-grid">
+      <div class="exam-card c-mon" style="max-width:520px;">
+        <div class="card-vak">🎤 Mondelinge Examens</div>
+        <div class="card-rows">
+          <div class="card-row"><span class="card-lbl">Periode</span><strong>13 – 24 juli 2026</strong></div>
+          <div class="card-row"><span class="card-lbl">Type</span><strong>College Staatsexamen</strong></div>
+          <div class="card-row"><span class="card-lbl">Locatie</span><strong>2 College Cobbenhagen, Tilburg</strong></div>
+        </div>
+        <div class="card-cd"><span class="cd-days" id="p-mon">–</span><span class="cd-suffix" id="s-mon">dagen te gaan</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3e tijdvak -->
+  <div class="tijdvak tv3">
+    <div class="tv-header">
+      <div class="tv-num">3</div>
+      <div class="tv-title">
+        <h2>3e Tijdvak — Herkansingen</h2>
+        <p>11–20 augustus 2026 (schriftelijk) · 27 aug – 5 sep 2026 (mondeling)</p>
+      </div>
+    </div>
+
+    <div class="sub-row">
+      <span class="pill pill-orange">✍️ Schriftelijk (Herkansing)</span>
+      <span class="sub-loc">Eindhoven</span>
+    </div>
+    <div class="exam-grid">
+      <div class="exam-card c-bio">
+        <div class="card-dag">Maandag</div>
+        <div class="card-vak">🌿 Biologie <span class="herk-tag">Herkansing</span></div>
+        <div class="card-rows">
+          <div class="card-row"><span class="card-lbl">Datum</span><strong>17 augustus 2026</strong></div>
+          <div class="card-row"><span class="card-lbl">Tijd</span><strong>09:30 – 12:30</strong></div>
+          <div class="card-row"><span class="card-lbl">Duur</span><strong>3 uur</strong></div>
+        </div>
+        <div class="card-cd"><span class="cd-days" id="p-bio3">–</span><span class="cd-suffix" id="s-bio3">dagen te gaan</span></div>
+      </div>
+      <div class="exam-card c-sch">
+        <div class="card-dag">Dinsdag</div>
+        <div class="card-vak">🧪 Scheikunde <span class="herk-tag">Herkansing</span></div>
+        <div class="card-rows">
+          <div class="card-row"><span class="card-lbl">Datum</span><strong>18 augustus 2026</strong></div>
+          <div class="card-row"><span class="card-lbl">Tijd</span><strong>09:30 – 12:30</strong></div>
+          <div class="card-row"><span class="card-lbl">Duur</span><strong>3 uur</strong></div>
+        </div>
+        <div class="card-cd"><span class="cd-days" id="p-sch3">–</span><span class="cd-suffix" id="s-sch3">dagen te gaan</span></div>
+      </div>
+    </div>
+
+    <div class="sub-row" style="margin-top:26px;">
+      <span class="pill pill-purple">🎤 Mondeling (Herkansing)</span>
+      <span class="sub-loc">Ede</span>
+    </div>
+    <div class="exam-grid">
+      <div class="exam-card c-mon" style="max-width:520px;">
+        <div class="card-vak">🎤 Mondelinge Herkansingen</div>
+        <div class="card-rows">
+          <div class="card-row"><span class="card-lbl">Periode</span><strong>27–29 aug &amp; 5 sep 2026</strong></div>
+          <div class="card-row"><span class="card-lbl">Locatie</span><strong>Ede</strong></div>
+          <div class="card-row"><span class="card-lbl">Tijden</span><strong>Nader te bepalen</strong></div>
+        </div>
+        <div class="card-cd"><span class="cd-days" id="p-ede">–</span><span class="cd-suffix" id="s-ede">dagen te gaan</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabel -->
+  <div class="sec-heading" style="margin-top:44px;">
+    <div class="sec-heading-icon" style="background:#fff3e0;">📋</div>
+    <div><h2>Volledig Overzicht</h2><p>Alle tijdvakken in één tabel</p></div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Vak</th><th>Datum</th><th>Dag</th><th>Tijd</th><th>Type</th><th>Tijdvak</th><th>Locatie</th></tr></thead>
+      <tbody>
+        <tr><td><span class="dot" style="background:#1e88e5;"></span>Natuurkunde</td><td>11 mei 2026</td><td>Maandag</td><td>13:30–16:30</td><td><span class="tbadge" style="background:#e3f2fd;color:#1565c0;">Schriftelijk</span></td><td>1e Tijdvak</td><td>Aristo, Eindhoven</td></tr>
+        <tr><td><span class="dot" style="background:#e53935;"></span>Nederlands</td><td>12 mei 2026</td><td>Dinsdag</td><td>13:30–16:30</td><td><span class="tbadge" style="background:#e3f2fd;color:#1565c0;">Schriftelijk</span></td><td>1e Tijdvak</td><td>Aristo, Eindhoven</td></tr>
+        <tr><td><span class="dot" style="background:#8e24aa;"></span>Filosofie</td><td>13 mei 2026</td><td>Woensdag</td><td>09:00–12:00</td><td><span class="tbadge" style="background:#e3f2fd;color:#1565c0;">Schriftelijk</span></td><td>1e Tijdvak</td><td>Aristo, Eindhoven</td></tr>
+        <tr><td><span class="dot" style="background:#fb8c00;"></span>Wiskunde B</td><td>13 mei 2026</td><td>Woensdag</td><td>13:30–16:30</td><td><span class="tbadge" style="background:#e3f2fd;color:#1565c0;">Schriftelijk</span></td><td>1e Tijdvak</td><td>Aristo, Eindhoven</td></tr>
+        <tr><td><span class="dot" style="background:#00897b;"></span>Scheikunde</td><td>19 mei 2026</td><td>Dinsdag</td><td>13:30–16:30</td><td><span class="tbadge" style="background:#e3f2fd;color:#1565c0;">Schriftelijk</span></td><td>1e Tijdvak</td><td>Aristo, Eindhoven</td></tr>
+        <tr><td><span class="dot" style="background:#43a047;"></span>Biologie</td><td>22 mei 2026</td><td>Vrijdag</td><td>13:30–16:30</td><td><span class="tbadge" style="background:#e3f2fd;color:#1565c0;">Schriftelijk</span></td><td>1e Tijdvak</td><td>Aristo, Eindhoven</td></tr>
+        <tr style="background:#fdf6ff;"><td><span class="dot" style="background:#8e24aa;"></span>Mondelinge Examens</td><td>13–24 juli 2026</td><td>Ma–Vr</td><td>NTB</td><td><span class="tbadge" style="background:#f3e5f5;color:#6a1b9a;">Mondeling</span></td><td>1e Tijdvak</td><td>2 College Cobbenhagen, Tilburg</td></tr>
+        <tr style="background:#f1f8f1;"><td><span class="dot" style="background:#43a047;"></span>Biologie</td><td>17 aug 2026</td><td>Maandag</td><td>09:30–12:30</td><td><span class="tbadge" style="background:#fff3e0;color:#e65100;">Herkansing</span></td><td>3e Tijdvak</td><td>Eindhoven</td></tr>
+        <tr style="background:#f1f8f1;"><td><span class="dot" style="background:#00897b;"></span>Scheikunde</td><td>18 aug 2026</td><td>Dinsdag</td><td>09:30–12:30</td><td><span class="tbadge" style="background:#fff3e0;color:#e65100;">Herkansing</span></td><td>3e Tijdvak</td><td>Eindhoven</td></tr>
+        <tr style="background:#f1f8f1;"><td><span class="dot" style="background:#8e24aa;"></span>Mondeling (Herkansing)</td><td>27–29 aug &amp; 5 sep 2026</td><td>Wisselend</td><td>NTB</td><td><span class="tbadge" style="background:#f3e5f5;color:#6a1b9a;">Mondeling</span></td><td>3e Tijdvak</td><td>Ede</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     KALENDER
+═══════════════════════════════════════════ -->
+<div id="sec-kalender" class="section">
+  <div class="sec-heading">
+    <div class="sec-heading-icon" style="background:#e8f5e9;">📅</div>
+    <div><h2>Kalender Overzicht</h2><p>Februari t/m september 2026 · met weeknummers en alle examendagen</p></div>
+  </div>
+  <div class="cal-legend">
+    <span class="cal-legend-item"><span class="cal-legend-dot" style="background:#bbdefb;"></span>Natuurkunde</span>
+    <span class="cal-legend-item"><span class="cal-legend-dot" style="background:#ffcdd2;"></span>Nederlands</span>
+    <span class="cal-legend-item"><span class="cal-legend-dot" style="background:#e1bee7;"></span>Filosofie / Mondeling</span>
+    <span class="cal-legend-item"><span class="cal-legend-dot" style="background:#ffe0b2;"></span>Wiskunde B / Herkansing</span>
+    <span class="cal-legend-item"><span class="cal-legend-dot" style="background:#b2dfdb;"></span>Scheikunde</span>
+    <span class="cal-legend-item"><span class="cal-legend-dot" style="background:#c8e6c9;"></span>Biologie</span>
+    <span class="cal-legend-item" style="background:#fffde7;padding:2px 8px;border-radius:6px;">Vandaag</span>
+  </div>
+  <div class="cal-grid-months" id="cal-container"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     KAART
+═══════════════════════════════════════════ -->
+<div id="sec-kaart" class="section">
+  <div class="sec-heading">
+    <div class="sec-heading-icon" style="background:#fce4ec;">🗺️</div>
+    <div><h2>Kaart &amp; Afstanden</h2><p>Examenlocaties en reisafstand vanaf jouw adressen</p></div>
+  </div>
+  <div id="map"></div>
+
+  <div class="sec-heading" style="margin-top:28px;">
+    <div class="sec-heading-icon" style="background:#e3f2fd;">📏</div>
+    <div><h2>Afstanden (hemelsbreed)</h2></div>
+  </div>
+  <div class="dist-cards">
+    <div class="dist-card">
+      <div class="dist-icon" style="background:#e3f2fd;">🏛️</div>
+      <div>
+        <h3>Aristo Eindhoven</h3>
+        <p>Vestdijk 30, 5611 CC Eindhoven<br><small>1e Tijdvak — Schriftelijk</small></p>
+        <div class="dist-row">
+          <div class="dist-badge">5,6 km<small>Orleanshof 50</small></div>
+          <div class="dist-badge">4,0 km<small>Vier Heemskinderenlaan</small></div>
+        </div>
+      </div>
+    </div>
+    <div class="dist-card">
+      <div class="dist-icon" style="background:#f3e5f5;">🏫</div>
+      <div>
+        <h3>2 College Cobbenhagen</h3>
+        <p>Brittendreef 5, 5012 AE Tilburg<br><small>1e Tijdvak — Mondeling</small></p>
+        <div class="dist-row">
+          <div class="dist-badge">26,4 km<small>Orleanshof 50</small></div>
+          <div class="dist-badge">28,2 km<small>Vier Heemskinderenlaan</small></div>
+        </div>
+      </div>
+    </div>
+    <div class="dist-card">
+      <div class="dist-icon" style="background:#e8f5e9;">🏢</div>
+      <div>
+        <h3>Eindhoven</h3>
+        <p>Locatie nader te bepalen<br><small>3e Tijdvak — Schriftelijk herkansing</small></p>
+        <div class="dist-row">
+          <div class="dist-badge">~5,5 km<small>Orleanshof 50</small></div>
+          <div class="dist-badge">~4,0 km<small>Vier Heemskinderenlaan</small></div>
+        </div>
+      </div>
+    </div>
+    <div class="dist-card">
+      <div class="dist-icon" style="background:#fff3e0;">🏙️</div>
+      <div>
+        <h3>Ede</h3>
+        <p>Locatie nader te bepalen<br><small>3e Tijdvak — Mondeling herkansing</small></p>
+        <div class="dist-row">
+          <div class="dist-badge">68,5 km<small>Orleanshof 50</small></div>
+          <div class="dist-badge">69,1 km<small>Vier Heemskinderenlaan</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     STUDIETRACKER
+═══════════════════════════════════════════ -->
+<div id="sec-tracker" class="section">
+  <div class="sec-heading">
+    <div class="sec-heading-icon" style="background:#e8f5e9;">✅</div>
+    <div>
+      <h2>Studietracker</h2>
+      <p>Houd bij welke onderwerpen je al hebt bestudeerd — wordt automatisch opgeslagen</p>
+    </div>
+  </div>
+  <div class="tracker-note" style="margin-bottom:20px;background:#eef0fb;border-radius:10px;padding:12px 16px;font-size:0.85rem;color:var(--muted);">
+    💡 Vink onderwerpen af zodra je ze hebt bestudeerd. Je voortgang wordt opgeslagen in je browser.
+  </div>
+  <div class="tracker-grid" id="tracker-container"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TIJDLIJN
+═══════════════════════════════════════════ -->
+<div id="sec-tijdlijn" class="section">
+  <div class="sec-heading">
+    <div class="sec-heading-icon" style="background:#e8f5e9;">🗓️</div>
+    <div><h2>Tijdlijn</h2><p>Chronologisch overzicht van alle examenmomenten</p></div>
+  </div>
+  <div class="tl">
+    <div class="tl-item">
+      <div class="tl-dot" style="color:#1e88e5;background:#1e88e5;"></div>
+      <div class="tl-card">
+        <div class="tl-date">11–22 mei 2026 · 1e Tijdvak</div>
+        <h3>✍️ Centrale Schriftelijke Staatsexamens</h3>
+        <p>Zes schriftelijke examens: Natuurkunde (11 mei), Nederlands (12 mei), Filosofie &amp; Wiskunde B (13 mei), Scheikunde (19 mei) en Biologie (22 mei). Locatie: <strong>Aristo, Vestdijk 30, Eindhoven</strong>. Filosofie 09:00–12:00; overige examens 13:30–16:30.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="color:#8e24aa;background:#8e24aa;"></div>
+      <div class="tl-card">
+        <div class="tl-date">13–24 juli 2026 · 1e Tijdvak</div>
+        <h3>🎤 Mondelinge College Staatsexamens</h3>
+        <p>Mondelinge examens als onderdeel van het 1e tijdvak. Locatie: <strong>2 College Cobbenhagen, Brittendreef 5, Tilburg</strong>. Exacte tijden worden nader bekendgemaakt.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="color:#43a047;background:#43a047;"></div>
+      <div class="tl-card">
+        <div class="tl-date">17–18 augustus 2026 · 3e Tijdvak</div>
+        <h3>✍️ Schriftelijke Herkansingen</h3>
+        <p>Biologie op <strong>maandag 17 augustus (09:30–12:30)</strong> en Scheikunde op <strong>dinsdag 18 augustus (09:30–12:30)</strong>. Locatie: Eindhoven.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="color:#fb8c00;background:#fb8c00;"></div>
+      <div class="tl-card">
+        <div class="tl-date">27–29 aug &amp; 5 sep 2026 · 3e Tijdvak</div>
+        <h3>🎤 Mondelinge Herkansingen</h3>
+        <p>Mondelinge herkansingen in het 3e tijdvak. Locatie: <strong>Ede</strong>. Exacte tijden worden nader bekendgemaakt.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /page-wrap -->
+
+<footer>
+  <p>Staatsexamen Overzicht 2026 · Bijgewerkt op 14 april 2026</p>
+</footer>
+
+<!-- Leaflet -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════
+   NAV
+══════════════════════════════════ */
+function nav(btn, id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'kaart') initMap();
+}
+
+/* ══════════════════════════════════
+   COUNTDOWN
+══════════════════════════════════ */
+const EXAMS = {
+  'nat':  new Date('2026-05-11'),
+  'ned':  new Date('2026-05-12'),
+  'fil':  new Date('2026-05-13'),
+  'wis':  new Date('2026-05-13'),
+  'sch':  new Date('2026-05-19'),
+  'bio':  new Date('2026-05-22'),
+  'mon':  new Date('2026-07-13'),
+  'bio3': new Date('2026-08-17'),
+  'sch3': new Date('2026-08-18'),
+  'ede':  new Date('2026-08-27'),
+};
+
+function pad(n) { return String(n).padStart(2,'0'); }
+
+function tick() {
+  const now  = new Date();
+  const first = new Date('2026-05-11T13:30:00');
+  const diff  = first - now;
+
+  if (diff > 0) {
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000)  / 60000);
+    const s = Math.floor((diff % 60000)    / 1000);
+    document.getElementById('cd-d').textContent = d;
+    document.getElementById('cd-h').textContent = pad(h);
+    document.getElementById('cd-m').textContent = pad(m);
+    document.getElementById('cd-s').textContent = pad(s);
+  } else {
+    document.getElementById('cd-d').textContent = '✓';
+    document.getElementById('cd-h').textContent = '–';
+    document.getElementById('cd-m').textContent = '–';
+    document.getElementById('cd-s').textContent = '–';
+  }
+
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  for (const [key, date] of Object.entries(EXAMS)) {
+    const el  = document.getElementById('p-' + key);
+    const sel = document.getElementById('s-' + key);
+    if (!el) continue;
+    const exam = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const days = Math.round((exam - today) / 86400000);
+    if (days < 0) {
+      el.textContent = '✓'; el.className = 'cd-days done';
+      if (sel) sel.textContent = 'afgerond';
+    } else if (days === 0) {
+      el.textContent = 'Vandaag!'; el.className = 'cd-days today-lbl';
+      if (sel) sel.textContent = '';
+    } else {
+      el.textContent = days; el.className = 'cd-days';
+      if (sel) sel.textContent = 'dagen te gaan';
+    }
+  }
+}
+tick();
+setInterval(tick, 1000);
+
+/* ══════════════════════════════════
+   CALENDAR
+══════════════════════════════════ */
+const CAL_EVENTS = {
+  '2026-05-11': [{l:'Natuurkunde 13:30', c:'ev-nat'}],
+  '2026-05-12': [{l:'Nederlands 13:30',  c:'ev-ned'}],
+  '2026-05-13': [{l:'Filosofie 09:00',   c:'ev-fil'},{l:'Wiskunde B 13:30',c:'ev-wis'}],
+  '2026-05-19': [{l:'Scheikunde 13:30',  c:'ev-sch'}],
+  '2026-05-22': [{l:'Biologie 13:30',    c:'ev-bio'}],
+  '2026-07-13': [{l:'Mondeling start',   c:'ev-mon'}],
+  '2026-07-14': [{l:'Mondeling',c:'ev-mon'}],
+  '2026-07-15': [{l:'Mondeling',c:'ev-mon'}],
+  '2026-07-16': [{l:'Mondeling',c:'ev-mon'}],
+  '2026-07-17': [{l:'Mondeling',c:'ev-mon'}],
+  '2026-07-20': [{l:'Mondeling',c:'ev-mon'}],
+  '2026-07-21': [{l:'Mondeling',c:'ev-mon'}],
+  '2026-07-22': [{l:'Mondeling',c:'ev-mon'}],
+  '2026-07-23': [{l:'Mondeling',c:'ev-mon'}],
+  '2026-07-24': [{l:'Mondeling einde',   c:'ev-mon'}],
+  '2026-08-17': [{l:'Biologie herk.',    c:'ev-herk'}],
+  '2026-08-18': [{l:'Scheikunde herk.',  c:'ev-herk'}],
+  '2026-08-27': [{l:'Mondeling Ede',     c:'ev-mon'}],
+  '2026-08-28': [{l:'Mondeling Ede',     c:'ev-mon'}],
+  '2026-08-29': [{l:'Mondeling Ede',     c:'ev-mon'}],
+  '2026-09-05': [{l:'Mondeling Ede',     c:'ev-mon'}],
+};
+
+function isoWeek(d) {
+  const dt = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const day = dt.getUTCDay() || 7;
+  dt.setUTCDate(dt.getUTCDate() + 4 - day);
+  const y1 = new Date(Date.UTC(dt.getUTCFullYear(), 0, 1));
+  return Math.ceil(((dt - y1) / 86400000 + 1) / 7);
+}
+
+function buildMonth(year, month, name, num) {
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
+  const firstDow = (new Date(year, month, 1).getDay() + 6) % 7; // 0=Mon
+  const totalDays = new Date(year, month+1, 0).getDate();
+  const days = ['Ma','Di','Wo','Do','Vr','Za','Zo'];
+
+  let html = `<div class="cal-month">
+    <div class="cal-month-hdr">
+      <span class="mname">${name} ${year}</span>
+      <span class="mnum">Maand ${num}</span>
+    </div>
+    <table class="cal-table">
+      <thead><tr>
+        <th class="wk-col">Wk</th>`;
+  days.forEach(d => html += `<th>${d}</th>`);
+  html += `</tr></thead><tbody>`;
+
+  let day = 1;
+  let col = firstDow;
+  while (day <= totalDays) {
+    const wkDate = new Date(year, month, day);
+    html += `<tr><td class="wk-cell">W${isoWeek(wkDate)}</td>`;
+    for (let c = 0; c < 7; c++) {
+      if ((day === 1 && c < col) || day > totalDays) {
+        html += `<td class="is-empty"></td>`;
+      } else {
+        const ds = `${year}-${pad(month+1)}-${pad(day)}`;
+        const evs = CAL_EVENTS[ds] || [];
+        const isToday = ds === todayStr;
+        const isWknd  = c >= 5;
+        let cls = '';
+        if (isToday) cls += ' is-today-cell';
+        if (evs.length) cls += ' has-exam';
+        if (isWknd && !evs.length && !isToday) cls += ' is-weekend-col';
+        html += `<td class="${cls.trim()}"><div class="cal-day-inner">`;
+        html += `<div class="cal-day-num${isToday?' is-today':''}${isWknd&&!isToday?' is-weekend':''}">${day}</div>`;
+        evs.forEach(e => html += `<span class="ev-chip ${e.c}">${e.l}</span>`);
+        html += `</div></td>`;
+        day++;
+      }
+    }
+    html += `</tr>`;
+    col = 0;
+  }
+  html += `</tbody></table></div>`;
+  return html;
+}
+
+(function renderCal() {
+  const months = [
+    [2026,1,'Februari',2],[2026,2,'Maart',3],[2026,3,'April',4],
+    [2026,4,'Mei',5],[2026,5,'Juni',6],[2026,6,'Juli',7],
+    [2026,7,'Augustus',8],[2026,8,'September',9]
+  ];
+  document.getElementById('cal-container').innerHTML =
+    months.map(([y,m,n,num]) => buildMonth(y,m,n,num)).join('');
+})();
+
+/* ══════════════════════════════════
+   MAP — Leaflet + OpenStreetMap only
+══════════════════════════════════ */
+let mapReady = false;
+function initMap() {
+  if (mapReady) return;
+  mapReady = true;
+
+  const map = L.map('map', {zoomControl: true}).setView([51.52, 5.28], 9);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 18
+  }).addTo(map);
+
+  function pin(emoji, bg) {
+    return L.divIcon({
+      html: `<div style="width:38px;height:38px;background:${bg};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.25rem;box-shadow:0 3px 10px rgba(0,0,0,0.3);border:2px solid #fff;">${emoji}</div>`,
+      iconSize:[38,38], iconAnchor:[19,19], popupAnchor:[0,-22], className:''
+    });
+  }
+
+  const popStyle = 'font-family:Segoe UI,sans-serif;font-size:13px;line-height:1.6;';
+
+  // Home 1
+  L.marker([51.4846468,5.4482278], {icon:pin('🏠','#1a237e')}).addTo(map)
+    .bindPopup(`<div style="${popStyle}"><b>Orleanshof 50</b><br>5627 LP Eindhoven<br><span style="color:#64748b;font-size:11px;">Thuisadres 1</span></div>`);
+
+  // Home 2
+  L.marker([51.4745407,5.4692854], {icon:pin('🏡','#3949ab')}).addTo(map)
+    .bindPopup(`<div style="${popStyle}"><b>De Vier Heemskinderenlaan 5</b><br>5625 HA Eindhoven<br><span style="color:#64748b;font-size:11px;">Thuisadres 2</span></div>`);
+
+  // Aristo
+  L.marker([51.4391196,5.4810689], {icon:pin('🏛️','#e53935')}).addTo(map)
+    .bindPopup(`<div style="${popStyle}"><b>Aristo Eindhoven</b><br>Vestdijk 30, 5611 CC Eindhoven<br><span style="color:#1565c0;font-size:11px;font-weight:700;">1e Tijdvak — Schriftelijk</span><br><span style="color:#64748b;font-size:11px;">Orleanshof: <b>5,6 km</b> · Vier Heemskinderenlaan: <b>4,0 km</b></span></div>`);
+
+  // Cobbenhagen
+  L.marker([51.5778828,5.0978057], {icon:pin('🏫','#8e24aa')}).addTo(map)
+    .bindPopup(`<div style="${popStyle}"><b>2 College Cobbenhagen</b><br>Brittendreef 5, 5012 AE Tilburg<br><span style="color:#6a1b9a;font-size:11px;font-weight:700;">1e Tijdvak — Mondeling</span><br><span style="color:#64748b;font-size:11px;">Orleanshof: <b>26,4 km</b> · Vier Heemskinderenlaan: <b>28,2 km</b></span></div>`);
+
+  // Ede
+  L.marker([52.0716826,5.7455106], {icon:pin('🏙️','#fb8c00')}).addTo(map)
+    .bindPopup(`<div style="${popStyle}"><b>Ede</b><br>3e Tijdvak — Mondeling herkansing<br><span style="color:#64748b;font-size:11px;">Orleanshof: <b>68,5 km</b> · Vier Heemskinderenlaan: <b>69,1 km</b></span></div>`);
+
+  // Lines from home 1
+  [[51.4391196,5.4810689],[51.5778828,5.0978057],[52.0716826,5.7455106]].forEach(loc => {
+    L.polyline([[51.4846468,5.4482278], loc], {color:'#1a237e',weight:2,dashArray:'6 5',opacity:0.5}).addTo(map);
+    L.polyline([[51.4745407,5.4692854], loc], {color:'#7986cb',weight:2,dashArray:'4 4',opacity:0.45}).addTo(map);
+  });
+
+  const leg = L.control({position:'bottomright'});
+  leg.onAdd = () => {
+    const d = L.DomUtil.create('div');
+    d.style.cssText = 'background:#fff;padding:12px 15px;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,0.15);font-size:12px;line-height:1.9;font-family:Segoe UI,sans-serif;';
+    d.innerHTML = `<b style="font-size:13px;display:block;margin-bottom:4px;">Legenda</b>
+      🏠 Orleanshof 50<br>🏡 Vier Heemskinderenlaan 5<br>
+      🏛️ Aristo Eindhoven<br>🏫 2 College Cobbenhagen<br>🏙️ Ede`;
+    return d;
+  };
+  leg.addTo(map);
+}
+
+/* ══════════════════════════════════
+   STUDY TRACKER
+══════════════════════════════════ */
+const SUBJECTS = [
+  { key:'nat', emoji:'⚛️', name:'Natuurkunde', color:'#1e88e5',
+    topics:['Mechanica','Elektriciteit','Golven & Licht','Warmteleer','Kernfysica','Formuleblad doorlopen'] },
+  { key:'ned', emoji:'📖', name:'Nederlands', color:'#e53935',
+    topics:['Leesvaardigheid','Schrijfvaardigheid','Literatuurgeschiedenis','Argumentatieleer','Samenvatten','Taalverzorging'] },
+  { key:'fil', emoji:'🧠', name:'Filosofie', color:'#8e24aa',
+    topics:['Kennisleer','Ethiek','Politieke filosofie','Metafysica','Argumentatietheorie','Filosofen & stromingen'] },
+  { key:'wis', emoji:'📐', name:'Wiskunde B', color:'#fb8c00',
+    topics:['Differentiëren','Integreren','Goniometrie','Exponenten & logaritmen','Ruimtemeetkunde','Statistiek'] },
+  { key:'sch', emoji:'🧪', name:'Scheikunde', color:'#00897b',
+    topics:['Atoomstructuur','Bindingen','Reactievergelijkingen','Zuren & basen','Organische chemie','Evenwichten'] },
+  { key:'bio', emoji:'🌿', name:'Biologie', color:'#43a047',
+    topics:['Cellen & weefsels','Genetica','Evolutie','Ecologie','Fysiologie','Regulatie & gedrag'] },
+];
+
+function loadProgress(key) {
+  try { return JSON.parse(localStorage.getItem('tracker_' + key) || '[]'); } catch { return []; }
+}
+function saveProgress(key, checked) {
+  try { localStorage.setItem('tracker_' + key, JSON.stringify(checked)); } catch {}
+}
+
+function buildTracker() {
+  const container = document.getElementById('tracker-container');
+  container.innerHTML = '';
+  SUBJECTS.forEach(sub => {
+    const checked = loadProgress(sub.key);
+    const total   = sub.topics.length;
+    const done    = checked.filter(Boolean).length;
+    const pct     = Math.round((done / total) * 100);
+
+    const card = document.createElement('div');
+    card.className = 'tracker-card';
+    card.style.borderLeftColor = sub.color;
+
+    card.innerHTML = `
+      <div class="tk-head">
+        <div class="tk-vak">${sub.emoji} ${sub.name}</div>
+        <div class="tk-pct" id="pct-${sub.key}" style="color:${sub.color};">${pct}%</div>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="bar-${sub.key}"
+          style="width:${pct}%;background:${sub.color};"></div>
+      </div>
+      <div class="tk-topics" id="topics-${sub.key}">
+        ${sub.topics.map((t, i) => `
+          <div class="tk-topic${checked[i]?' checked':''}" id="row-${sub.key}-${i}">
+            <input type="checkbox" id="cb-${sub.key}-${i}" ${checked[i]?'checked':''}
+              onchange="toggleTopic('${sub.key}',${i},${total})"/>
+            <label for="cb-${sub.key}-${i}">${t}</label>
+          </div>`).join('')}
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+function toggleTopic(key, idx, total) {
+  const checked = loadProgress(key);
+  while (checked.length < total) checked.push(false);
+  checked[idx] = document.getElementById(`cb-${key}-${idx}`).checked;
+  saveProgress(key, checked);
+
+  const row = document.getElementById(`row-${key}-${idx}`);
+  if (checked[idx]) row.classList.add('checked');
+  else row.classList.remove('checked');
+
+  const done = checked.filter(Boolean).length;
+  const pct  = Math.round((done / total) * 100);
+  document.getElementById(`pct-${key}`).textContent = pct + '%';
+  document.getElementById(`bar-${key}`).style.width = pct + '%';
+}
+
+buildTracker();
+</script>
+</body>
+</html>
