@@ -257,6 +257,73 @@
       font-size: 0.68rem; background: #fff3e0; color: var(--orange);
       border-radius: 5px; padding: 2px 7px; font-weight: 700; margin-left: 4px;
     }
+    /* tijdvak 2 */
+    .tijdvak.tv2 { background: linear-gradient(135deg,#fce4ec,#fdf6f8); border-color: #f48fb1; }
+    .tv2 .tv-num { background: #c2185b; }
+    .tv2 .tv-title h2 { color: #c2185b; }
+    .c-fil2 { border-left-color: #c2185b; }
+
+    /* ════════════════════════════════
+       PASSEND EXAMINEREN
+    ════════════════════════════════ */
+    .pe-banner {
+      background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+      color: #fff;
+      border-radius: var(--r);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      display: flex; align-items: flex-start; gap: 18px;
+      box-shadow: var(--shadow2);
+    }
+    .pe-banner-icon {
+      font-size: 2.4rem; flex-shrink: 0; line-height: 1;
+    }
+    .pe-banner h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 4px; }
+    .pe-banner p  { font-size: 0.85rem; opacity: 0.8; line-height: 1.5; }
+    .pe-banner .pe-ref {
+      display: inline-block; margin-top: 8px;
+      background: rgba(255,255,255,0.15); border-radius: 6px;
+      padding: 3px 12px; font-size: 0.75rem; font-weight: 700;
+    }
+    .pe-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .pe-card {
+      background: var(--surface);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      padding: 20px 22px;
+      border-left: 5px solid #1a237e;
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .pe-card-icon {
+      font-size: 1.6rem; flex-shrink: 0; margin-top: 2px;
+    }
+    .pe-card h4 { font-size: 0.95rem; font-weight: 800; color: var(--blue); margin-bottom: 5px; }
+    .pe-card p  { font-size: 0.84rem; color: var(--muted); line-height: 1.55; }
+    .pe-card .pe-tag {
+      display: inline-block; margin-top: 8px;
+      background: #eef0fb; color: var(--blue);
+      border-radius: 5px; padding: 2px 9px;
+      font-size: 0.72rem; font-weight: 700;
+    }
+    .pe-important {
+      background: #fff8e1;
+      border: 2px solid #ffd54f;
+      border-radius: var(--r);
+      padding: 18px 22px;
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .pe-important-icon { font-size: 1.8rem; flex-shrink: 0; }
+    .pe-important h4 { font-size: 0.95rem; font-weight: 800; color: #e65100; margin-bottom: 6px; }
+    .pe-important p  { font-size: 0.85rem; color: var(--text); line-height: 1.55; }
+    @media (max-width: 700px) {
+      .pe-grid { grid-template-columns: 1fr; }
+      .pe-banner { flex-direction: column; gap: 10px; }
+    }
 
     /* ════════════════════════════════
        FULL TABLE
@@ -543,7 +610,7 @@
     <h1>📚 Examen Overzicht</h1>
     <p>Alle examens, datums, locaties en afstanden op één plek</p>
     <div class="countdown-strip">
-      <span>⏳ Eerste examen (Natuurkunde):</span>
+      <span>⏳ Eerste examen (Ned. Schrijfvaardigheid):</span>
       <div class="cd-blocks">
         <div class="cd-block"><span class="num" id="cd-d">–</span><span class="lbl">dagen</span></div>
         <div class="cd-block"><span class="num" id="cd-h">–</span><span class="lbl">uur</span></div>
@@ -564,6 +631,7 @@
     <button class="nav-btn" onclick="nav(this,'kaart')">🗺️ Kaart</button>
     <button class="nav-btn" onclick="nav(this,'tracker')">✅ Studietracker</button>
     <button class="nav-btn" onclick="nav(this,'tijdlijn')">🗓️ Tijdlijn</button>
+    <button class="nav-btn" onclick="nav(this,'passend')">♿ Passend Examineren</button>
   </div>
 </nav>
 
@@ -589,6 +657,17 @@
       <span class="sub-loc">Aristo · Vestdijk 30 · 5611 CC Eindhoven</span>
     </div>
     <div class="exam-grid">
+      <div class="exam-card c-ned">
+        <div class="card-dag">Donderdag</div>
+        <div class="card-vak">📖 Nederlands <span class="herk-tag" style="background:#fce4ec;color:#c2185b;">Schrijfvaardigheid</span></div>
+        <div class="card-rows">
+          <div class="card-row"><span class="card-lbl">Datum</span><strong>7 mei 2026</strong></div>
+          <div class="card-row"><span class="card-lbl">Tijd</span><strong>13:30 – 16:00</strong></div>
+          <div class="card-row"><span class="card-lbl">Duur</span><strong>2,5 uur</strong></div>
+          <div class="card-row"><span class="card-lbl">Type</span><strong>Schrijfvaardigheid</strong></div>
+        </div>
+        <div class="card-cd"><span class="cd-days" id="p-nedw">–</span><span class="cd-suffix" id="s-nedw">dagen te gaan</span></div>
+      </div>
       <div class="exam-card c-nat">
         <div class="card-dag">Maandag</div>
         <div class="card-vak">⚛️ Natuurkunde</div>
@@ -601,23 +680,13 @@
       </div>
       <div class="exam-card c-ned">
         <div class="card-dag">Dinsdag</div>
-        <div class="card-vak">📖 Nederlands</div>
+        <div class="card-vak">📖 Nederlands <span class="herk-tag" style="background:#fce4ec;color:#c2185b;">Centraal</span></div>
         <div class="card-rows">
           <div class="card-row"><span class="card-lbl">Datum</span><strong>12 mei 2026</strong></div>
           <div class="card-row"><span class="card-lbl">Tijd</span><strong>13:30 – 16:30</strong></div>
           <div class="card-row"><span class="card-lbl">Duur</span><strong>3 uur</strong></div>
         </div>
         <div class="card-cd"><span class="cd-days" id="p-ned">–</span><span class="cd-suffix" id="s-ned">dagen te gaan</span></div>
-      </div>
-      <div class="exam-card c-fil">
-        <div class="card-dag">Woensdag</div>
-        <div class="card-vak">🧠 Filosofie</div>
-        <div class="card-rows">
-          <div class="card-row"><span class="card-lbl">Datum</span><strong>13 mei 2026</strong></div>
-          <div class="card-row"><span class="card-lbl">Tijd</span><strong>09:00 – 12:00</strong></div>
-          <div class="card-row"><span class="card-lbl">Duur</span><strong>3 uur</strong></div>
-        </div>
-        <div class="card-cd"><span class="cd-days" id="p-fil">–</span><span class="cd-suffix" id="s-fil">dagen te gaan</span></div>
       </div>
       <div class="exam-card c-wis">
         <div class="card-dag">Woensdag</div>
@@ -664,6 +733,35 @@
           <div class="card-row"><span class="card-lbl">Locatie</span><strong>2 College Cobbenhagen, Tilburg</strong></div>
         </div>
         <div class="card-cd"><span class="cd-days" id="p-mon">–</span><span class="cd-suffix" id="s-mon">dagen te gaan</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2e tijdvak -->
+  <div class="tijdvak tv2">
+    <div class="tv-header">
+      <div class="tv-num">2</div>
+      <div class="tv-title">
+        <h2>2e Tijdvak — Filosofie (Centraal)</h2>
+        <p>Schriftelijk centraal examen filosofie in Arnhem</p>
+      </div>
+    </div>
+    <div class="sub-row">
+      <span class="pill" style="background:#fce4ec;color:#c2185b;">✍️ Schriftelijk (Centraal)</span>
+      <span class="sub-loc">Locatie: Arnhem (nader te bepalen)</span>
+    </div>
+    <div class="exam-grid">
+      <div class="exam-card c-fil2">
+        <div class="card-dag">Nader te bepalen</div>
+        <div class="card-vak">🧠 Filosofie <span class="herk-tag" style="background:#fce4ec;color:#c2185b;">2e Tijdvak</span></div>
+        <div class="card-rows">
+          <div class="card-row"><span class="card-lbl">Datum</span><strong>Nader te bepalen</strong></div>
+          <div class="card-row"><span class="card-lbl">Locatie</span><strong>Arnhem</strong></div>
+          <div class="card-row"><span class="card-lbl">Type</span><strong>Centraal Staatsexamen</strong></div>
+        </div>
+        <div class="card-cd" style="border-top:1px solid #f8bbd0;">
+          <span style="font-size:0.82rem;color:#c2185b;font-weight:700;">Tijdvak 2 — datum volgt</span>
+        </div>
       </div>
     </div>
   </div>
@@ -731,13 +829,14 @@
     <table>
       <thead><tr><th>Vak</th><th>Datum</th><th>Dag</th><th>Tijd</th><th>Type</th><th>Tijdvak</th><th>Locatie</th></tr></thead>
       <tbody>
+        <tr><td><span class="dot" style="background:#e53935;"></span>Nederlands — Schrijfvaardigheid</td><td>7 mei 2026</td><td>Donderdag</td><td>13:30–16:00</td><td><span class="tbadge" style="background:#fce4ec;color:#c2185b;">Schrijfvaardigheid</span></td><td>1e Tijdvak</td><td>Aristo, Eindhoven</td></tr>
         <tr><td><span class="dot" style="background:#1e88e5;"></span>Natuurkunde</td><td>11 mei 2026</td><td>Maandag</td><td>13:30–16:30</td><td><span class="tbadge" style="background:#e3f2fd;color:#1565c0;">Schriftelijk</span></td><td>1e Tijdvak</td><td>Aristo, Eindhoven</td></tr>
-        <tr><td><span class="dot" style="background:#e53935;"></span>Nederlands</td><td>12 mei 2026</td><td>Dinsdag</td><td>13:30–16:30</td><td><span class="tbadge" style="background:#e3f2fd;color:#1565c0;">Schriftelijk</span></td><td>1e Tijdvak</td><td>Aristo, Eindhoven</td></tr>
-        <tr><td><span class="dot" style="background:#8e24aa;"></span>Filosofie</td><td>13 mei 2026</td><td>Woensdag</td><td>09:00–12:00</td><td><span class="tbadge" style="background:#e3f2fd;color:#1565c0;">Schriftelijk</span></td><td>1e Tijdvak</td><td>Aristo, Eindhoven</td></tr>
+        <tr><td><span class="dot" style="background:#e53935;"></span>Nederlands — Centraal</td><td>12 mei 2026</td><td>Dinsdag</td><td>13:30–16:30</td><td><span class="tbadge" style="background:#e3f2fd;color:#1565c0;">Schriftelijk</span></td><td>1e Tijdvak</td><td>Aristo, Eindhoven</td></tr>
         <tr><td><span class="dot" style="background:#fb8c00;"></span>Wiskunde B</td><td>13 mei 2026</td><td>Woensdag</td><td>13:30–16:30</td><td><span class="tbadge" style="background:#e3f2fd;color:#1565c0;">Schriftelijk</span></td><td>1e Tijdvak</td><td>Aristo, Eindhoven</td></tr>
         <tr><td><span class="dot" style="background:#00897b;"></span>Scheikunde</td><td>19 mei 2026</td><td>Dinsdag</td><td>13:30–16:30</td><td><span class="tbadge" style="background:#e3f2fd;color:#1565c0;">Schriftelijk</span></td><td>1e Tijdvak</td><td>Aristo, Eindhoven</td></tr>
         <tr><td><span class="dot" style="background:#43a047;"></span>Biologie</td><td>22 mei 2026</td><td>Vrijdag</td><td>13:30–16:30</td><td><span class="tbadge" style="background:#e3f2fd;color:#1565c0;">Schriftelijk</span></td><td>1e Tijdvak</td><td>Aristo, Eindhoven</td></tr>
         <tr style="background:#fdf6ff;"><td><span class="dot" style="background:#8e24aa;"></span>Mondelinge Examens</td><td>13–24 juli 2026</td><td>Ma–Vr</td><td>NTB</td><td><span class="tbadge" style="background:#f3e5f5;color:#6a1b9a;">Mondeling</span></td><td>1e Tijdvak</td><td>2 College Cobbenhagen, Tilburg</td></tr>
+        <tr style="background:#fdf0f5;"><td><span class="dot" style="background:#c2185b;"></span>Filosofie</td><td>Nader te bepalen</td><td>NTB</td><td>NTB</td><td><span class="tbadge" style="background:#fce4ec;color:#c2185b;">Schriftelijk</span></td><td>2e Tijdvak</td><td>Arnhem</td></tr>
         <tr style="background:#f1f8f1;"><td><span class="dot" style="background:#43a047;"></span>Biologie</td><td>17 aug 2026</td><td>Maandag</td><td>09:30–12:30</td><td><span class="tbadge" style="background:#fff3e0;color:#e65100;">Herkansing</span></td><td>3e Tijdvak</td><td>Eindhoven</td></tr>
         <tr style="background:#f1f8f1;"><td><span class="dot" style="background:#00897b;"></span>Scheikunde</td><td>18 aug 2026</td><td>Dinsdag</td><td>09:30–12:30</td><td><span class="tbadge" style="background:#fff3e0;color:#e65100;">Herkansing</span></td><td>3e Tijdvak</td><td>Eindhoven</td></tr>
         <tr style="background:#f1f8f1;"><td><span class="dot" style="background:#8e24aa;"></span>Mondeling (Herkansing)</td><td>27–29 aug &amp; 5 sep 2026</td><td>Wisselend</td><td>NTB</td><td><span class="tbadge" style="background:#f3e5f5;color:#6a1b9a;">Mondeling</span></td><td>3e Tijdvak</td><td>Ede</td></tr>
@@ -855,11 +954,27 @@
   </div>
   <div class="tl">
     <div class="tl-item">
+      <div class="tl-dot" style="color:#e53935;background:#e53935;"></div>
+      <div class="tl-card">
+        <div class="tl-date">7 mei 2026 · 1e Tijdvak</div>
+        <h3>📖 Nederlands — Schrijfvaardigheid</h3>
+        <p>Schrijfvaardigheidsexamen Nederlands op <strong>donderdag 7 mei 2026 (13:30–16:00)</strong>. Locatie: <strong>Aristo, Vestdijk 30, Eindhoven</strong>. Duur: 2,5 uur.</p>
+      </div>
+    </div>
+    <div class="tl-item">
       <div class="tl-dot" style="color:#1e88e5;background:#1e88e5;"></div>
       <div class="tl-card">
         <div class="tl-date">11–22 mei 2026 · 1e Tijdvak</div>
         <h3>✍️ Centrale Schriftelijke Staatsexamens</h3>
-        <p>Zes schriftelijke examens: Natuurkunde (11 mei), Nederlands (12 mei), Filosofie &amp; Wiskunde B (13 mei), Scheikunde (19 mei) en Biologie (22 mei). Locatie: <strong>Aristo, Vestdijk 30, Eindhoven</strong>. Filosofie 09:00–12:00; overige examens 13:30–16:30.</p>
+        <p>Vijf schriftelijke examens: Natuurkunde (11 mei), Nederlands centraal (12 mei), Wiskunde B (13 mei), Scheikunde (19 mei) en Biologie (22 mei). Locatie: <strong>Aristo, Vestdijk 30, Eindhoven</strong>. Alle examens 13:30–16:30.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="color:#c2185b;background:#c2185b;"></div>
+      <div class="tl-card">
+        <div class="tl-date">2e Tijdvak · Datum volgt</div>
+        <h3>🧠 Filosofie — Centraal Schriftelijk (2e Tijdvak)</h3>
+        <p>Centraal schriftelijk examen Filosofie in het 2e tijdvak. Locatie: <strong>Arnhem</strong>. Exacte datum en tijd worden nader bekendgemaakt.</p>
       </div>
     </div>
     <div class="tl-item">
@@ -886,6 +1001,105 @@
         <p>Mondelinge herkansingen in het 3e tijdvak. Locatie: <strong>Ede</strong>. Exacte tijden worden nader bekendgemaakt.</p>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════
+     PASSEND EXAMINEREN
+═════════════════════════════════════════════ -->
+<div id="sec-passend" class="section">
+  <div class="sec-heading">
+    <div class="sec-heading-icon" style="background:#e8eaf6;">♿</div>
+    <div><h2>Passend Examineren</h2><p>Goedgekeurde voorzieningen · ED-nummer 467226 · Brief: 5 maart 2026</p></div>
+  </div>
+
+  <div class="pe-banner">
+    <div class="pe-banner-icon">📄</div>
+    <div>
+      <h3>Beslissing Passend Examineren 2026 — VWO Staatsexamen</h3>
+      <p>Naar aanleiding van jouw verzoek heeft DUO de volgende voorzieningen <strong>goedgekeurd</strong> voor alle schriftelijke en mondelinge staatsexamens in 2026. Toon deze brief samen met je oproep vóór aanvang van ieder examen aan de voorzitter van de examenlocatie.</p>
+      <span class="pe-ref">🏢 Dienst Uitvoering Onderwijs · Afdeling Examendiensten · ED-nr. 467226</span>
+    </div>
+  </div>
+
+  <div class="pe-grid">
+    <div class="pe-card">
+      <div class="pe-card-icon">🚪</div>
+      <div>
+        <h4>Aparte Examenruimte</h4>
+        <p>Je mag de schriftelijke examens afleggen in een aparte ruimte. Naast de vereiste examenbetrokkenen ben jij de enige kandidaat in deze ruimte.</p>
+        <span class="pe-tag">✍️ Schriftelijk</span>
+      </div>
+    </div>
+    <div class="pe-card">
+      <div class="pe-card-icon">💻</div>
+      <div>
+        <h4>Laptop als Schrijfgerei</h4>
+        <p>Je mag een laptop gebruiken als schrijfgerei, waarbij je de spellingscontrole in alle gevallen mag inschakelen. Zie de bijlage voor alle voorwaarden rondom laptopgebruik.</p>
+        <span class="pe-tag">✍️ Schriftelijk</span>
+      </div>
+    </div>
+    <div class="pe-card">
+      <div class="pe-card-icon">🛌</div>
+      <div>
+        <h4>Rustpauze (max. 30 min)</h4>
+        <p>Je mag tijdens de schriftelijke examens gebruikmaken van een rustpauze. Deze pauze gaat <strong>niet</strong> af van je examentijd en wordt in overleg met een examenbetrokkene genomen. Je hebt dan geen toegang tot het examenwerk. Deze pauze mag ook gebruikt worden als powernap.</p>
+        <span class="pe-tag">✍️ Schriftelijk</span>
+      </div>
+    </div>
+    <div class="pe-card">
+      <div class="pe-card-icon">⏰</div>
+      <div>
+        <h4>30 Minuten Verlenging</h4>
+        <p>Je krijgt 30 minuten extra tijd bij alle schriftelijke examens. De totale examentijd wordt hiermee verlengd van 3 uur naar 3,5 uur (of van 2,5 uur naar 3 uur voor schrijfvaardigheid).</p>
+        <span class="pe-tag">✍️ Schriftelijk</span>
+      </div>
+    </div>
+    <div class="pe-card">
+      <div class="pe-card-icon">🎙️</div>
+      <div>
+        <h4>10 Min. Extra Voorbereidingstijd (Mondeling)</h4>
+        <p>Je krijgt 10 minuten extra voorbereidingstijd bij de college-examens mondeling. Je moet <strong>30 minuten</strong> vóór het mondelinge examen aanwezig zijn in het voorbereidingslokaal.</p>
+        <span class="pe-tag">🎤 Mondeling</span>
+      </div>
+    </div>
+    <div class="pe-card">
+      <div class="pe-card-icon">🚪</div>
+      <div>
+        <h4>Aparte Ruimte Mondelinge Voorbereiding</h4>
+        <p>Je mag de voorbereidingsopdracht voor het college-examen mondeling afleggen in een aparte ruimte. Naast de vereiste examenbetrokkenen ben jij de enige kandidaat in deze ruimte.</p>
+        <span class="pe-tag">🎤 Mondeling</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pe-important">
+    <div class="pe-important-icon">⚠️</div>
+    <div>
+      <h4>Belangrijk: Toon deze brief bij elk examen</h4>
+      <p>Je moet deze brief samen met je <strong>oproep</strong> vóór aanvang van <strong>ieder examen</strong> tonen aan de voorzitter van de examenlocatie. Dit geldt voor zowel de schriftelijke als de mondelinge examens, in alle tijdvakken. Zorg dat je de brief altijd bij je hebt op de examendag.</p>
+    </div>
+  </div>
+
+  <div class="sec-heading" style="margin-top:32px;">
+    <div class="sec-heading-icon" style="background:#fff3e0;">⏱️</div>
+    <div><h2>Aangepaste Examentijden</h2><p>Jouw examens duren langer door de 30 minuten verlenging</p></div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Vak</th><th>Datum</th><th>Normale tijd</th><th>Jouw tijd (+30 min)</th><th>Locatie</th></tr></thead>
+      <tbody>
+        <tr><td>📖 Nederlands — Schrijfvaardigheid</td><td>7 mei 2026</td><td>13:30–16:00 (2,5 uur)</td><td><strong>13:30–16:30 (3 uur)</strong></td><td>Aristo, Eindhoven</td></tr>
+        <tr><td>⚛️ Natuurkunde</td><td>11 mei 2026</td><td>13:30–16:30 (3 uur)</td><td><strong>13:30–17:00 (3,5 uur)</strong></td><td>Aristo, Eindhoven</td></tr>
+        <tr><td>📖 Nederlands — Centraal</td><td>12 mei 2026</td><td>13:30–16:30 (3 uur)</td><td><strong>13:30–17:00 (3,5 uur)</strong></td><td>Aristo, Eindhoven</td></tr>
+        <tr><td>📐 Wiskunde B</td><td>13 mei 2026</td><td>13:30–16:30 (3 uur)</td><td><strong>13:30–17:00 (3,5 uur)</strong></td><td>Aristo, Eindhoven</td></tr>
+        <tr><td>🧪 Scheikunde</td><td>19 mei 2026</td><td>13:30–16:30 (3 uur)</td><td><strong>13:30–17:00 (3,5 uur)</strong></td><td>Aristo, Eindhoven</td></tr>
+        <tr><td>🌿 Biologie</td><td>22 mei 2026</td><td>13:30–16:30 (3 uur)</td><td><strong>13:30–17:00 (3,5 uur)</strong></td><td>Aristo, Eindhoven</td></tr>
+        <tr style="background:#fdf0f5;"><td>🧠 Filosofie (2e tijdvak)</td><td>Nader te bepalen</td><td>NTB</td><td><strong>NTB + 30 min</strong></td><td>Arnhem</td></tr>
+        <tr style="background:#f1f8f1;"><td>🌿 Biologie (herkansing)</td><td>17 aug 2026</td><td>09:30–12:30 (3 uur)</td><td><strong>09:30–13:00 (3,5 uur)</strong></td><td>Eindhoven</td></tr>
+        <tr style="background:#f1f8f1;"><td>🧪 Scheikunde (herkansing)</td><td>18 aug 2026</td><td>09:30–12:30 (3 uur)</td><td><strong>09:30–13:00 (3,5 uur)</strong></td><td>Eindhoven</td></tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
@@ -916,9 +1130,9 @@ function nav(btn, id) {
    COUNTDOWN
 ══════════════════════════════════ */
 const EXAMS = {
+  'nedw': new Date('2026-05-07'),
   'nat':  new Date('2026-05-11'),
   'ned':  new Date('2026-05-12'),
-  'fil':  new Date('2026-05-13'),
   'wis':  new Date('2026-05-13'),
   'sch':  new Date('2026-05-19'),
   'bio':  new Date('2026-05-22'),
@@ -932,7 +1146,7 @@ function pad(n) { return String(n).padStart(2,'0'); }
 
 function tick() {
   const now  = new Date();
-  const first = new Date('2026-05-11T13:30:00');
+  const first = new Date('2026-05-07T13:30:00');
   const diff  = first - now;
 
   if (diff > 0) {
@@ -977,9 +1191,10 @@ setInterval(tick, 1000);
    CALENDAR
 ══════════════════════════════════ */
 const CAL_EVENTS = {
+  '2026-05-07': [{l:'Ned. Schrijfvaardigheid 13:30', c:'ev-ned'}],
   '2026-05-11': [{l:'Natuurkunde 13:30', c:'ev-nat'}],
-  '2026-05-12': [{l:'Nederlands 13:30',  c:'ev-ned'}],
-  '2026-05-13': [{l:'Filosofie 09:00',   c:'ev-fil'},{l:'Wiskunde B 13:30',c:'ev-wis'}],
+  '2026-05-12': [{l:'Nederlands Centraal 13:30',  c:'ev-ned'}],
+  '2026-05-13': [{l:'Wiskunde B 13:30',c:'ev-wis'}],
   '2026-05-19': [{l:'Scheikunde 13:30',  c:'ev-sch'}],
   '2026-05-22': [{l:'Biologie 13:30',    c:'ev-bio'}],
   '2026-07-13': [{l:'Mondeling start',   c:'ev-mon'}],
